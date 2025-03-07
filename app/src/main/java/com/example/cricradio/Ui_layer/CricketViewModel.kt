@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 import androidx.lifecycle.ViewModel
-import com.example.cricradio.di.modal.MiniMatchResponse
-import com.example.cricradio.di.modal.ValueInfoResponse
+import com.example.cricradio.Data_layer.modal.MiniMatchResponse
+import com.example.cricradio.Data_layer.modal.ValueInfoResponse
 import com.example.cricradio.common.State
 //import com.example.cricradio.Data_layer.modal.VenueInfo.ValueInfoResponse
 import com.example.cricradio.Data_layer.repo.CricketRepository

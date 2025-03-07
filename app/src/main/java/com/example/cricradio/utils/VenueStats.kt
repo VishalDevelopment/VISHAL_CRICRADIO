@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cricradio.di.modal.ValueInfoResponse
+import com.example.cricradio.Data_layer.modal.ValueInfoResponse
 
 data class VenueStats(
     val matchesPlayed: Int,

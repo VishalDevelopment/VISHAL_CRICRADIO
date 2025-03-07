@@ -1,4 +1,4 @@
-package com.example.cricradio.Data_layer.module
+package com.example.cricradio.di.module
 
 import com.example.cricradio.Data_layer.retrofit.CricketApiService
 import com.example.cricradio.Data_layer.repo.CricketRepository

@@ -2,8 +2,8 @@ package com.example.cricradio.Data_layer.repo
 
 
 import android.util.Log
-import com.example.cricradio.di.modal.MiniMatchResponse
-import com.example.cricradio.di.modal.ValueInfoResponse
+import com.example.cricradio.Data_layer.modal.MiniMatchResponse
+import com.example.cricradio.Data_layer.modal.ValueInfoResponse
 import com.example.cricradio.Data_layer.retrofit.CricketApiService
 import com.example.cricradio.common.State
 import javax.inject.Inject

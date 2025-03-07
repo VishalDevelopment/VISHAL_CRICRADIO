@@ -13,8 +13,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.cricradio.di.modal.Now
-import com.example.cricradio.di.modal.Teams
+import com.example.cricradio.Data_layer.modal.Now
+import com.example.cricradio.Data_layer.modal.Teams
 import com.example.cricradio.R
 
 @Composable
