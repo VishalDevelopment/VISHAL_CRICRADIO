@@ -1,4 +1,4 @@
-package com.example.cricradio.Ui_layer.screen
+package com.example.cricradio.utils
 
 
 import androidx.compose.foundation.BorderStroke
@@ -8,12 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cricradio.di.modal.ValueInfoResponse
 
 data class VenueStats(
     val matchesPlayed: Int,
@@ -34,52 +33,56 @@ data class InningsStats(
 )
 
 @Composable
-@Preview
-fun VenueStatsUI() {
-    val gradientBrush = Brush.verticalGradient(
-        colors = listOf(Color(0xFF121212), Color(0xFFFFFF0D)),
-        startY = 0f,
-        endY = Float.POSITIVE_INFINITY
-    )
+fun VenueStatsUI(fullMatchDetails: ValueInfoResponse?) {
+    val venueStats = fullMatchDetails?.responseData?.result?.venueStats
 
     val stats = VenueStats(
-        matchesPlayed = 25,
-        lowestDefended = 25,
-        highestChased = 25,
-        winBatFirst = 25,
-        winBallFirst = 25,
-        firstInningsStats = InningsStats(320, 320, 320, Pair(32, "62%"), Pair(22, "43%")),
-        secondInningsStats = InningsStats(120, 120, 120, Pair(22, "43%"), Pair(32, "62%"))
+        matchesPlayed = venueStats?.matchesPlayed ?: 0,
+        lowestDefended = venueStats?.lowestDefended ?: 0,
+        highestChased = venueStats?.highestChased ?: 0,
+        winBatFirst = venueStats?.batFirstWins ?: 0,
+        winBallFirst = venueStats?.ballFirstWins ?: 0,
+        firstInningsStats = InningsStats(
+            avgScore = venueStats?.battingFirst?.averageScore ?: 0,
+            highestScore = venueStats?.battingFirst?.highestScore ?: 0,
+            lowestScore = venueStats?.battingFirst?.lowestScore ?: 0,
+            paceWickets = Pair(venueStats?.battingFirst?.paceWickets ?: 0, "N/A"),
+            spinWickets = Pair(venueStats?.battingFirst?.spinWickets ?: 0, "N/A")
+        ),
+        secondInningsStats = InningsStats(
+            avgScore = venueStats?.battingSecond?.averageScore ?: 0,
+            highestScore = venueStats?.battingSecond?.highestScore ?: 0,
+            lowestScore = venueStats?.battingSecond?.lowestScore ?: 0,
+            paceWickets = Pair(venueStats?.battingSecond?.paceWickets ?: 0, "N/A"),
+            spinWickets = Pair(venueStats?.battingSecond?.spinWickets ?: 0, "N/A")
+        )
     )
-    Column {
+Column {
         Text(
             "Venue Stats",
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 12.dp)
-
         )
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-            ,        colors = CardDefaults.cardColors(containerColor =  Color(0xFF1A1A1A)), // Slightly lighter than before
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
             elevation = CardDefaults.cardElevation(8.dp),
             shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f)) // White border with slight transparency
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f))
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-
-
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 StatsRow("Matches Played", stats.matchesPlayed.toString())
+                Divider(color = Color(0xFF817C7C), thickness = 1.dp)
                 StatsRow("Lowest Defended", stats.lowestDefended.toString())
+                Divider(color = Color(0xFF817C7C), thickness = 1.dp)
                 StatsRow("Highest Chased", stats.highestChased.toString())
+                Divider(color = Color(0xFF817C7C), thickness = 1.dp)
                 StatsRow("Win Bat First", stats.winBatFirst.toString())
+                Divider(color = Color(0xFF817C7C), thickness = 1.dp)
                 StatsRow("Win Ball First", stats.winBallFirst.toString())
+                Divider(color = Color(0xFF817C7C), thickness = 1.dp)
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -88,13 +91,11 @@ fun VenueStatsUI() {
                     colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A).copy(alpha = 0.1f)),
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row{
+                        Row {
                             Text("1st Inn", color = Color.White, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.padding(horizontal = 18.dp))
                             Text("2nd Inn", color = Color.White, fontWeight = FontWeight.Bold)
@@ -107,31 +108,39 @@ fun VenueStatsUI() {
                     stats.firstInningsStats.avgScore.toString(),
                     stats.secondInningsStats.avgScore.toString()
                 )
+                Divider(color = Color(0xFF817C7C), thickness = 1.dp)
+
                 StatsRowWithTwoColumns(
                     "Highest Score",
                     stats.firstInningsStats.highestScore.toString(),
                     stats.secondInningsStats.highestScore.toString()
                 )
+                Divider(color = Color(0xFF817C7C), thickness = 1.dp)
+
                 StatsRowWithTwoColumns(
                     "Lowest Score",
                     stats.firstInningsStats.lowestScore.toString(),
                     stats.secondInningsStats.lowestScore.toString()
                 )
+                Divider(color = Color(0xFF817C7C), thickness = 1.dp)
+
                 StatsRowWithTwoColumns(
                     "Pace Wickets",
                     "${stats.firstInningsStats.paceWickets.first} (${stats.firstInningsStats.paceWickets.second})",
                     "${stats.secondInningsStats.paceWickets.first} (${stats.secondInningsStats.paceWickets.second})"
                 )
+                Divider(color = Color(0xFF817C7C), thickness = 1.dp)
+
                 StatsRowWithTwoColumns(
                     "Spin Wickets",
                     "${stats.firstInningsStats.spinWickets.first} (${stats.firstInningsStats.spinWickets.second})",
                     "${stats.secondInningsStats.spinWickets.first} (${stats.secondInningsStats.spinWickets.second})"
                 )
-
             }
         }
     }
 }
+
 
 @Composable
 fun StatsRow(label: String, value: String) {

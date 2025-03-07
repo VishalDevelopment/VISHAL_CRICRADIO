@@ -1,7 +1,7 @@
 package com.example.cricradio.Data_layer.retrofit
 
-import com.example.cricradio.Data_layer.modal.MiniMatchResponse
-import com.example.cricradio.Data_layer.modal.ValueInfoResponse
+import com.example.cricradio.di.modal.MiniMatchResponse
+import com.example.cricradio.di.modal.ValueInfoResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -18,7 +18,7 @@ interface CricketApiService {
 
 
 
-    @GET("api/v2/match/venue-info")
+    @GET("/api/v2/match/venue-info")
     suspend fun getVenueInfo(
         @Header("Authorization") authHeader: String = "Basic Y3JpY2tldFJhZGlvOmNyaWNrZXRAJCUjUmFkaW8xMjM=",
         @Query("key") matchKey: String = "SA_vs_SL_2024-12-05_1732276435.300452"

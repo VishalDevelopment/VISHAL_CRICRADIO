@@ -1,180 +1,175 @@
 package com.example.cricradio.Ui_layer.screen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.example.cricradio.Ui_layer.CricketViewModel
 import com.example.cricradio.R
 
-@Composable
-@Preview(showBackground = true, backgroundColor = 0)
-
-fun VenueInfoScreen() {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
-        .verticalScroll(rememberScrollState())) {
-        CricketScoreCard()
-        Spacer(modifier = Modifier.height(8.dp))
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF0A192F)),
-            elevation = CardDefaults.cardElevation(8.dp),
-            shape = RoundedCornerShape(16.dp) // Increased border radius
-        ) {
-
-
-
-
-            Box {
-                Image(
-                    painter = painterResource(id = R.drawable.bg_img), // Replace with your image
-                    contentDescription = "Background Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp), // Adjust height as needed
-                    contentScale = ContentScale.Crop
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Text Field with requested text
-        Text(
-            text = "Pallekele International Cricket Stadium, Pallekele Sri Lanka, Sri Lanka",
-            fontSize = 16.sp,
-            color = Color(0xFF5891D4),
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Text Field with requested text
-        Text(
-            text = "2nd ODI  Afghanistan Tour of Sri Lanka 2024",
-            fontSize = 16.sp,
-            color = Color.Gray,
-            fontWeight = FontWeight.Bold
-        )
-//        14 Feb 2024, Thursday 2:30 PM
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "14 Feb 2024, Thursday 2:30 PM",
-            fontSize = 14.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.08f),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF0A192F)),
-            elevation = CardDefaults.cardElevation(8.dp),
-            shape = RoundedCornerShape(16.dp) // Increased border radius
-        ){
-
-            Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "PAK won the toss and chose to bat first",
-                    fontSize = 10.sp,
-                    color = Color(0xFFFAC86E),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(3.dp)
-                        .fillMaxWidth()
-                        .padding(start = 5.dp)
-                )
-            }
-        }
-        UmpiresCard()
-        Spacer(modifier = Modifier.height(8.dp))
-        WeatherCard()
-        Spacer(modifier = Modifier.height(8.dp))
-        VenueStatsUI()
-    }
-}
-
+import com.example.cricradio.common.State
+import com.example.cricradio.utils.CricketScoreCard
+import com.example.cricradio.utils.UmpiresCard
+import com.example.cricradio.utils.VenueStatsUI
+import com.example.cricradio.utils.WeatherCard
 
 @Composable
-fun UmpiresCard() {
+fun VenueInfoScreen(viewmodel: CricketViewModel = hiltViewModel()) {
+    val match = viewmodel.miniMatchDetails.collectAsState()
+    val full = viewmodel.fullMatchDetails.collectAsState()
+
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = "Umpires",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), // Dark background
-            elevation = CardDefaults.cardElevation(2.dp),
-            shape = RoundedCornerShape(12.dp) // Rounded corners
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    UmpireDetail(title = "Umpire", name = "Michael Gough")
-                    UmpireDetail(title = "Umpire", name = "Lyndon Hannibal")
+        when (val matchState = match.value) {
+            is State.Loading -> {
+                Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                    Text(text = "Loading content...", color = Color.White)
                 }
+            }
+            is State.Error -> {
+                Text(text = "Error: ${matchState.message}", color = Color.Red)
+            }
+            is State.Success -> {
+                matchState.data?.responseData?.result?.teams?.let { teams ->
+                    CricketScoreCard(
+                        teams = teams,
+                        status = matchState.data?.responseData.result.status ?: "Match Status Unavailable",
+                        now = matchState.data?.responseData.result.now,
+                        currentBattingTeam = matchState.data.responseData.result.settingObj?.currentTeam
+                    )
+                }
+            }
+        }
 
-                Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
+        when (val fullState = full.value) {
+            is State.Loading -> {
+            }
+            is State.Error -> {
+                Text(text = "Error: ${fullState.message}", color = Color.Red)
+            }
+            is State.Success -> {
+                fullState.data?.responseData?.result?.let { matchDetails ->
+                    // Stadium Image
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF0A192F)),
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Box {
+                            AsyncImage(
+                                model = matchDetails.venueDetails?.photo ?: R.drawable.bg_img,
+                                contentDescription = "Stadium Background",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(150.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    UmpireDetail(title = "Third/TV Umpire", name = "Michael Gough")
-                    UmpireDetail(title = "Referee", name = "Chris Broad")
+                    // Venue Name
+                    Text(
+                        text = matchDetails.venueDetails?.knownAs ?: "Venue Not Available",
+                        fontSize = 16.sp,
+                        color = Color(0xFF5891D4),
+                        fontWeight = FontWeight.Bold,
+                        textDecoration = TextDecoration.Underline
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Match Details
+                    Text(
+                        text = matchDetails.related_name ?: "Match Info Not Available",
+                        fontSize = 16.sp,
+                        color = Color.LightGray,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = matchDetails.start_date?.str ?: "Date & Time Not Available",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.08f),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF0A192F)),
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        shape = RoundedCornerShape(2.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(Color(0xFF121212), Color(0x0DFFFFFF))
+                                    )
+                                ),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = matchDetails.toss?.str ?: "Toss Info Not Available",
+                                fontSize = 10.sp,
+                                color = Color(0xFFFAC86E),
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(3.dp)
+                                    .fillMaxWidth()
+                                    .padding(start = 5.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    UmpiresCard(fullState.data)
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    WeatherCard(fullState.data)
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    VenueStatsUI(fullState.data)
                 }
             }
         }
     }
 }
 
-@Composable
-fun UmpireDetail(title: String, name: String) {
-    Column {
-        Text(
-            text = title,
-            fontSize = 12.sp,
-            color = Color.Gray
-        )
-        Text(
-            text = name,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-    }
-}
+
+
+
+
+
+

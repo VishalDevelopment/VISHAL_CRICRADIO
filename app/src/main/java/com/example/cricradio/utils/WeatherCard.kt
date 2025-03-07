@@ -1,7 +1,6 @@
-package com.example.cricradio.Ui_layer.screen
+package com.example.cricradio.utils
 
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -9,19 +8,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.example.cricradio.di.modal.ValueInfoResponse
 import com.example.cricradio.R
-
 @Composable
-@Preview()
-fun WeatherCard() {
+fun WeatherCard(fullMatchDetails: ValueInfoResponse?) {
+    // Extract Weather Data from API
+    val weather = fullMatchDetails?.responseData?.result?.weather
+    val location = weather?.location ?: "Location Not Available"
+    val temperature = weather?.temp_c ?: 0.0
+    val condition = weather?.condition?.text ?: "Condition Not Available"
+    val weatherIconUrl = weather?.condition?.icon // ✅ URL for the weather icon
+    val lastUpdated = weather?.last_updated ?: "Not Updated"
+
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         Text(
             text = "Weather",
@@ -41,59 +45,55 @@ fun WeatherCard() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Weather Icon
-                Image(
-                    painter = painterResource(id = R.drawable.weather_icon), // Replace with actual image
+                // Weather Icon (from API)
+                AsyncImage(
+                    model = weatherIconUrl ?: R.drawable.weather_icon, // Use API image, fallback to local
                     contentDescription = "Weather Icon",
                     modifier = Modifier
-                        .size(width = 88.dp, height = 75.dp)
+                        .size(80.dp)
                         .padding(end = 12.dp)
                 )
 
-                // Weather Details (Temperature, Condition)
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "Pallekele, Sri Lanka",
-                        fontSize = 14.sp,
+                        text = location,
+                        fontSize = 10.sp,
                         color = Color.Gray
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text(
-                            text = "25° C",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFFFD700) // Gold color for temp
-                        )
-                    }
+                    Text(
+                        text = "$temperature° C",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFFFD700) // Gold color for temp
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Partly Cloudy",
-                        fontSize = 14.sp,
+                        text = condition,
+                        fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF5891D4) // Blue color
                     )
                 }
 
-                // Divider & Last Updated
+                // Divider
+                Divider(
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .height(40.dp)
+                        .width(1.dp)
+                        .padding(horizontal = 12.dp) // Adds spacing
+                )
+
+                // Last Updated Section
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Divider(
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .height(40.dp)
-                            .width(1.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column {
                     Text(
                         text = "Last Updated",
                         fontSize = 12.sp,
@@ -101,7 +101,7 @@ fun WeatherCard() {
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "14 Feb, 5:32 PM",
+                        text = lastUpdated,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -111,3 +111,4 @@ fun WeatherCard() {
         }
     }
 }
+

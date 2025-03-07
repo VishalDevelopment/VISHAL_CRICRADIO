@@ -1,7 +1,7 @@
 package com.example.cricradio.Data_layer.module
 
 import com.example.cricradio.Data_layer.retrofit.CricketApiService
-import com.example.cricradio.repo.CricketRepository
+import com.example.cricradio.Data_layer.repo.CricketRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

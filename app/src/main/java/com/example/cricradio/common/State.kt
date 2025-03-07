@@ -1,4 +1,4 @@
-package com.example.cricradio
+package com.example.cricradio.common
 
 sealed class State<T>(val data: T? = null, val message: String? = null) {
     class Loading<T> : State<T>()

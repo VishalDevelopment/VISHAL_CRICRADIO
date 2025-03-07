@@ -1,4 +1,4 @@
-package com.example.cricradio.Data_layer.modal
+package com.example.cricradio.di.modal
 
 
 data class MiniMatchResponse(
